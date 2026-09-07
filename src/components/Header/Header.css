@@ -1,17 +1,28 @@
 .header {
-  padding-top: 15px;
-  padding-bottom: 15px;
+  position: relative;
+  z-index: 2;
+  height: 10vh;
+  box-sizing: border-box;
   background-color: rgb(20, 23, 20);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.58);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.16);
 }
 
 .header .container {
+  height: 100%;
   display: flex;
   align-items: center;
 }
 
+.header__balance,
+.header__auth {
+  height: 42px;
+  box-sizing: border-box;
+}
+
 .header__balance {
   margin-left: auto;
-  width: 100px;
+  width: 156px;
 
   display: flex;
   align-items: center;
@@ -35,17 +46,24 @@
 
 .header__balance svg {
   color: #9dff00;
-  font-size: 16px;
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
 
   filter: drop-shadow(0 0 4px rgba(140, 255, 0, 0.5));
 }
 
 .header__balance-add {
+  flex: 0 0 20px;
+  width: 20px;
+  padding: 0;
   background: none;
   font-size: 25px;
   font-weight: 800;
   color: white;
   border: none;
+  line-height: 1;
   cursor: pointer;
   transition: all 0.2s ease;
 }

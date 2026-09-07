@@ -7,13 +7,13 @@ import { FaSteam } from "react-icons/fa";
 
 import "./Header.css"
 
-const Header = () => {
+const Header = ({ userBalance }) => {
   return (
     <header className="header">
       <Container>
         <Logo></Logo>
         <div className="header__balance">
-           <FaCoins /> <span className="header__balance-number">0,00</span>
+           <FaCoins /> <span className="header__balance-number">{userBalance.toLocaleString("ru-RU", { minimumFractionDigits: 2 })}</span>
            <button className="header__balance-add">+</button>
         </div>
         <button className="header__auth">

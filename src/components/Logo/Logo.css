@@ -1,8 +1,12 @@
 .logo {
+  height: 42px;
+  display: flex;
+  align-items: center;
   font-size: 40px;
   font-family: "Climate Crisis", sans-serif;
 
   font-weight: 300;
+  line-height: 1;
 }
 
 .logo__first-text {

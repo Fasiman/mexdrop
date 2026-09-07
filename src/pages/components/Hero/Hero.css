@@ -1,7 +1,9 @@
 .hero {
   position: relative;
+  min-height: 100vh;
   padding-top: 0;
-  padding-bottom: 200px;
+  padding-bottom: 0;
+  box-sizing: border-box;
   background-color: rgb(20, 23, 20);
   isolation: isolate;
   overflow: hidden;
@@ -14,66 +16,103 @@
   background-image: url("../../../images/herobg.jpg");
   background-size: cover;
   background-position: center;
-  opacity: 0.04;
+  opacity: 0.10;
   filter: grayscale(100%) brightness(40%);
   z-index: -1;
 }
 
+/* ==========================================================================
+   Top Marquee / Ticker
+   ========================================================================== */
+
 .hero__top {
-  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  width: 176px;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(5, 8, 6, 0.18), rgba(5, 8, 6, 0.48));
+  border-right: 1px solid rgba(225, 226, 227, 0.1);
+  background: linear-gradient(90deg, rgba(5, 8, 6, 0.68), rgba(5, 8, 6, 0.18));
 }
 
 .hero__top-track {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 6px;
   width: 100%;
   padding: 6px 4px;
+  box-sizing: border-box;
   transition: transform 0.46s cubic-bezier(0.22, 0.8, 0.25, 1);
 }
 
 .hero__top-track--entering {
-  transform: translateX(calc(-1 * (clamp(105px, 10vw, 170px) + 8px)));
+  transform: translateY(calc(-1 * (132px + 6px)));
   transition: none;
 }
 
 .hero__top-track--stepping {
-  transform: translateX(0);
+  transform: translateY(0);
 }
 
 .hero__lightbox {
   position: relative;
-  flex: 0 0 clamp(105px, 10vw, 170px);
-  height: 145px;
+  flex: 0 0 132px;
+  width: 100%;
+  height: 132px;
+  box-sizing: border-box;
   overflow: hidden;
   isolation: isolate;
-  border-radius: 5px;
+  border: 0;
+  border-radius: 2px;
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.06), transparent 42%),
-    rgba(14, 18, 15, 0.34);
+    linear-gradient(145deg, rgba(255, 255, 255, 0.045), transparent 42%),
+    rgba(14, 18, 15, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(225, 226, 227, 0.16),
+    inset 0 -1px 0 rgba(184, 255, 44, 0.22);
 }
 
 .hero__lightbox::before {
   content: "";
   position: absolute;
-  right: -10%;
-  bottom: -24%;
-  width: 120%;
-  height: 48%;
+  right: -6%;
+  bottom: -22%;
+  width: 112%;
+  height: 42%;
   border-radius: 50%;
   background: radial-gradient(ellipse, var(--weapon-glow), transparent 68%);
-  filter: blur(20px) saturate(1.15);
+  filter: blur(18px) saturate(1.1);
   pointer-events: none;
+}
+
+.hero__lightbox::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.72;
+  background:
+    linear-gradient(var(--weapon-glow), var(--weapon-glow)) left top / 24px 1px no-repeat,
+    linear-gradient(var(--weapon-glow), var(--weapon-glow)) left top / 1px 24px no-repeat,
+    linear-gradient(var(--weapon-glow), var(--weapon-glow)) right top / 24px 1px no-repeat,
+    linear-gradient(var(--weapon-glow), var(--weapon-glow)) right top / 1px 24px no-repeat,
+    linear-gradient(var(--weapon-glow), var(--weapon-glow)) left bottom / 24px 1px no-repeat,
+    linear-gradient(var(--weapon-glow), var(--weapon-glow)) left bottom / 1px 24px no-repeat,
+    linear-gradient(var(--weapon-glow), var(--weapon-glow)) right bottom / 24px 1px no-repeat,
+    linear-gradient(var(--weapon-glow), var(--weapon-glow)) right bottom / 1px 24px no-repeat;
+  filter: drop-shadow(0 0 4px var(--weapon-glow));
 }
 
 .hero__lightbox-image {
   position: absolute;
-  inset: 9px;
-  width: calc(100% - 18px);
-  height: calc(100% - 18px);
-  opacity: 0.56;
-  border-radius: 4px;
+  inset: 7px;
+  width: calc(100% - 14px);
+  height: calc(100% - 14px);
+  opacity: 0.52;
+  border-radius: 5px;
   object-fit: contain;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent 55%);
   box-shadow:
@@ -83,9 +122,9 @@
 
 .hero__lightbox-info {
   position: absolute;
-  right: 12px;
-  bottom: 11px;
-  left: 12px;
+  right: 10px;
+  bottom: 9px;
+  left: 10px;
   z-index: 1;
   display: grid;
   gap: 3px;
@@ -94,19 +133,24 @@
 
 .hero__lightbox-upgrade {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 9px;
+  right: 9px;
   z-index: 2;
-  padding: 4px 7px;
-  color: #d4c58d;
-  background: rgba(37, 38, 23, 0.72);
-  border: 1px solid rgba(203, 185, 111, 0.42);
-  border-radius: 4px;
-  box-shadow: 0 3px 12px rgba(25, 28, 13, 0.24);
-  font-size: 10px;
+  min-width: 31px;
+  padding: 4px 6px 5px;
+  color: #e8d9a8;
+  background: rgba(7, 12, 10, 0.66);
+  border: 1px solid rgba(225, 226, 227, 0.16);
+  border-bottom: 1px solid var(--weapon-glow);
+  border-radius: 3px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(6px);
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.04em;
   line-height: 1;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .hero__lightbox-info strong {
@@ -122,127 +166,63 @@
   letter-spacing: 0.1em;
 }
 
+/* ==========================================================================
+   Upgrade Section Layout
+   ========================================================================== */
+
 .hero__upgrade {
+  width: min(1500px, 100%);
+  margin: 0 auto;
   display: flex;
   gap: 72px;
-  padding-top: 64px;
+  min-height: 100vh;
+  padding-left: 210px;
+  padding-top: 30px;
+  padding-bottom: 86px;
+  box-sizing: border-box;
+  align-items: center;
   text-align: center;
   justify-content: center;
 }
 
-.hero__chance {
-  position: relative;
-  flex: 0 0 220px;
-  align-self: center;
+.hero__selection-column {
   display: grid;
+  grid-template-rows: 360px 340px;
+  flex: 0 1 400px;
+  width: 100%;
   gap: 14px;
-  padding: 18px 0;
-  text-align: center;
 }
 
-.hero__chance-label {
-  color: rgba(225, 226, 227, 0.58);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.hero__chance-value {
-  color: #d4c58d;
-  font-size: 66px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1;
-  text-shadow: 0 0 28px rgba(183, 159, 75, 0.34);
-}
-
-.hero__chance-scale {
-  width: 190px;
-  height: 104px;
-  margin: 4px auto 0;
-  overflow: visible;
-}
-
-.hero__chance-track,
-.hero__chance-fill {
-  fill: none;
-  stroke-linecap: round;
-  stroke-width: 12;
-}
-
-.hero__chance-track {
-  stroke: rgba(225, 226, 227, 0.16);
-}
-
-.hero__chance-fill {
-  stroke: #b8d66a;
-  stroke-dasharray: 100;
-  stroke-dashoffset: var(--chance-offset);
-  filter: drop-shadow(0 0 9px rgba(184, 255, 44, 0.44));
-  transition: stroke-dashoffset 0.16s ease-out;
-}
-
-.hero__chance-marker {
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  width: 18px;
-  height: 18px;
-  border: 4px solid #dce9b0;
-  border-radius: 50%;
-  background: #24321b;
-  box-shadow: 0 0 20px rgba(184, 255, 44, 0.68);
-  transform: translateX(-50%);
-}
-
-.hero__chance-limits {
-  display: flex;
-  justify-content: space-between;
-  color: rgba(225, 226, 227, 0.36);
-  font-size: 10px;
-}
-
-.akbackground {
-  position: absolute;
-  right: 50%;
-  bottom: -48px;
-  z-index: 0;
-  width: 300px;
-  color: rgba(91, 108, 55, 0.2);
-  opacity: 1;
-  font-size: 300px;
-  font-weight: 500;
-  font-family: "Climate Crisis", sans-serif;
-  line-height: 1;
-  text-align: center;
-  transform: translateX(50%) rotate(-5deg);
-  text-shadow:
-    0 0 24px rgba(91, 128, 38, 0.16),
-    1px 0 0 rgba(91, 128, 38, 0.24);
-  -webkit-text-stroke: 1px rgba(145, 161, 94, 0.12);
-  user-select: none;
-}
 .hero__upgrade-box {
   position: relative;
-  min-height: 360px;
+  box-sizing: border-box;
+  height: 360px;
   overflow: hidden;
   isolation: isolate;
   background:
     radial-gradient(circle at 78% 82%, rgba(125, 157, 55, 0.1), transparent 42%),
     linear-gradient(145deg, rgba(45, 50, 42, 0.62), rgba(10, 14, 14, 0.95) 58%, rgba(29, 31, 27, 0.9));
-
-  border-radius: 30px;
-  border: 1px solid rgba(165, 184, 126, 0.22);
+  border-radius: 22px;
+  border: 1px solid rgba(184, 255, 44, 0.32);
   padding: 15px;
   max-width: 400px;
   width: 100%;
-
   box-shadow:
-    inset 0 1px 0 rgba(225, 240, 193, 0.14),
-    inset 0 0 0 1px rgba(184, 255, 44, 0.04),
-    0 8px 30px rgba(0, 0, 0, 0.24);
+    inset 0 1px 0 rgba(239, 255, 205, 0.16),
+    inset 0 0 0 1px rgba(184, 255, 44, 0.08),
+    0 0 0 1px rgba(6, 10, 7, 0.72),
+    0 14px 34px rgba(0, 0, 0, 0.3);
   transition: transform 0.28s ease, box-shadow 0.28s ease;
+}
+
+.hero__upgrade-box::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  z-index: -1;
+  border: 1px solid rgba(225, 240, 193, 0.1);
+  border-radius: 16px;
+  pointer-events: none;
 }
 
 .hero__upgrade-box:hover {
@@ -251,6 +231,7 @@
   box-shadow:
     inset 0 1px 0 rgba(225, 240, 193, 0.2),
     inset 0 0 0 1px rgba(184, 255, 44, 0.08),
+    0 0 22px rgba(184, 255, 44, 0.12),
     0 12px 36px rgba(0, 0, 0, 0.34);
 }
 
@@ -270,8 +251,728 @@
 .hero__upgrade-title {
   position: relative;
   z-index: 1;
+  max-width: 290px;
+  margin: 2px auto 0;
+  color: #e8f2d9;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.035em;
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+.hero__selected-weapon {
+  position: absolute;
+  inset: 64px 24px 18px;
+  z-index: 1;
+  display: grid;
+  align-content: end;
+  justify-items: center;
+  gap: 5px;
+  color: #f1f7eb;
+}
+
+.hero__selected-weapon::before {
+  content: "";
+  position: absolute;
+  right: 4%;
+  bottom: 10%;
+  left: 4%;
+  height: 38%;
+  z-index: -1;
+  border-radius: 50%;
+  background: var(--weapon-glow);
+  filter: blur(28px);
+  opacity: 0.48;
+}
+
+.hero__selected-weapon img {
+  width: 100%;
+  height: 210px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 18px var(--weapon-glow));
+}
+
+.hero__selected-weapon strong {
+  font-size: 20px;
+  letter-spacing: 0.04em;
+}
+
+.hero__selected-weapon span {
+  color: rgba(225, 226, 227, 0.68);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hero__selected-weapon span svg,
+.hero__weapon-card em svg {
+  width: 11px;
+  height: 11px;
+  color: #b8ff2c;
+  vertical-align: -1px;
+}
+
+.hero__weapon-picker {
+  box-sizing: border-box;
+  height: 340px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(184, 255, 44, 0.24);
+  border-radius: 12px;
+  background: rgba(8, 13, 10, 0.68);
+  box-shadow:
+    inset 0 1px 0 rgba(239, 255, 205, 0.1),
+    inset 0 0 0 1px rgba(184, 255, 44, 0.04),
+    0 10px 26px rgba(0, 0, 0, 0.24);
+}
+
+.hero__win-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(3, 8, 4, 0.84);
+  backdrop-filter: blur(8px);
+  animation: hero-win-overlay-in 0.25s ease-out both;
+}
+
+.hero__win-overlay--closing {
+  animation: hero-win-overlay-out 0.45s ease-in both;
+}
+
+.hero__win-content {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  color: #b8ff2c;
+  text-align: center;
+  filter: drop-shadow(0 0 28px rgba(184, 255, 44, 0.28));
+  animation: hero-win-content-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero__win-overlay--closing .hero__win-content {
+  animation: hero-win-content-out 0.45s ease-in both;
+}
+
+.hero__win-kicker {
+  color: rgba(225, 240, 193, 0.68);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.hero__win-content img {
+  width: min(62vw, 520px);
+  height: min(42vh, 360px);
+  object-fit: contain;
+  filter: drop-shadow(0 0 26px var(--weapon-glow));
+}
+
+.hero__win-content strong {
+  color: #b8ff2c;
+  font-size: clamp(42px, 8vw, 92px);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 0.95;
+  text-transform: uppercase;
+  text-shadow: 0 0 24px rgba(184, 255, 44, 0.72);
+}
+
+.hero__win-name {
+  color: #f1f7eb;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.hero__win-price {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #d8e99d;
+  font-size: 14px;
+}
+
+.hero__win-price svg {
+  color: #b8ff2c;
+}
+
+@keyframes hero-win-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes hero-win-content-in {
+  from { opacity: 0; transform: scale(0.82) translateY(18px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes hero-win-overlay-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes hero-win-content-out {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to { opacity: 0; transform: scale(0.94) translateY(-12px); }
+}
+
+.hero__weapon-picker-title {
+  display: block;
+  color: rgba(184, 255, 44, 0.7);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.hero__weapon-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+
+.hero__weapon-sort {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: rgba(225, 226, 227, 0.5);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero__weapon-sort select {
+  max-width: 132px;
+  padding: 5px 20px 5px 7px;
+  color: #d8e99d;
+  background: rgba(22, 29, 23, 0.9);
+  border: 1px solid rgba(184, 255, 44, 0.24);
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 9px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.hero__weapon-sort select:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.hero__weapon-price-range {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+
+.hero__weapon-price-range label {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  color: rgba(225, 226, 227, 0.5);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.hero__weapon-price-range input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 7px 25px 7px 8px;
+  color: #e4eadc;
+  background: rgba(22, 29, 23, 0.9);
+  border: 1px solid rgba(184, 255, 44, 0.2);
+  border-radius: 4px;
+  outline: none;
+  font: inherit;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero__weapon-price-range input:focus {
+  border-color: rgba(184, 255, 44, 0.65);
+  box-shadow: 0 0 0 2px rgba(184, 255, 44, 0.08);
+}
+
+.hero__weapon-price-range input:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.hero__weapon-price-range label svg {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 11px;
+  height: 11px;
+  color: #b8ff2c;
+}
+
+.hero__weapon-price-divider {
+  padding-bottom: 8px;
+  color: rgba(225, 226, 227, 0.42);
+  font-size: 10px;
+  text-transform: lowercase;
+}
+
+.hero__weapon-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-color: rgba(184, 255, 44, 0.45) rgba(225, 226, 227, 0.08);
+  scrollbar-width: thin;
+}
+
+.hero__weapon-card {
+  position: relative;
+  display: grid;
+  grid-template-rows: 38px auto auto;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  min-height: 76px;
+  padding: 6px 6px 7px;
+  overflow: hidden;
+  color: #e4eadc;
+  background: rgba(22, 29, 23, 0.88);
+  border: 1px solid rgba(225, 226, 227, 0.1);
+  border-left: 2px solid var(--weapon-glow);
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.hero__weapon-card:hover,
+.hero__weapon-card--selected {
+  background: rgba(44, 58, 35, 0.92);
+  border-color: var(--weapon-glow);
+  transform: translateY(-2px);
+}
+
+.hero__weapon-card--disabled,
+.hero__weapon-card--disabled:hover {
+  cursor: not-allowed;
+  opacity: 0.32;
+  transform: none;
+}
+
+.hero__weapon-card img {
+  width: 42px;
+  height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px var(--weapon-glow));
+}
+
+.hero__weapon-card span {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.hero__weapon-card strong {
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hero__weapon-card small {
+  color: rgba(225, 226, 227, 0.56);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hero__weapon-card em {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: rgba(225, 226, 227, 0.64);
+  font-size: 10px;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero__weapon-card b {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  justify-self: end;
+  color: #d8e99d;
+  font-size: 11px;
 }
 
 #upgrade_small {
   font-size: 14px;
+}
+
+/* ==========================================================================
+   Chance Gauge & Wheel
+   ========================================================================== */
+
+.hero__chance {
+  position: relative;
+  flex: 0 0 340px;
+  align-self: center;
+  display: grid;
+  gap: 14px;
+  padding: 18px 0;
+  text-align: center;
+}
+
+.hero__chance-label {
+  color: rgba(184, 255, 44, 0.72);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hero__chance-value {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  margin: 0;
+  color: #e3d49a;
+  font-size: 48px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  transform: translate(-50%, -62%);
+  text-shadow: 0 0 18px rgba(183, 159, 75, 0.28);
+}
+
+.hero__chance-gauge {
+  position: relative;
+  width: 330px;
+  height: 330px;
+  margin: 2px auto 0;
+}
+
+.hero__chance-scale {
+  position: relative;
+  width: 330px;
+  height: 330px;
+  display: block;
+  overflow: visible;
+}
+
+.hero__chance-track,
+.hero__chance-fill {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 24;
+}
+
+.hero__chance-outer-ring {
+  fill: none;
+  stroke: rgba(225, 226, 227, 0.16);
+  stroke-width: 3;
+}
+
+.hero__chance-track {
+  stroke: rgba(225, 226, 227, 0.16);
+}
+
+.hero__chance-fill {
+  stroke: #b8ff2c;
+  stroke-dasharray: 50;
+  stroke-dashoffset: var(--chance-offset);
+  filter: drop-shadow(0 0 8px rgba(184, 255, 44, 0.34));
+  transition: stroke 1.5s cubic-bezier(0.16, 1, 0.3, 1), 
+              filter 1.5s cubic-bezier(0.16, 1, 0.3, 1), 
+              stroke-dashoffset 0.16s ease-out;
+}
+
+/* Полностью убрана подсветка и свечение при выигрыше */
+.hero__chance-fill--win {
+  stroke: #b8ff2c !important;
+  filter: none !important;
+}
+
+/* Красный свет при проигрыше плавно уходит */
+.hero__chance-fill--lose {
+  stroke: #ff3b30 !important;
+  filter: drop-shadow(0 0 14px rgba(255, 59, 48, 0.8)) !important;
+}
+
+.hero__chance-fill--default {
+  stroke: #b8ff2c;
+}
+
+/* ==========================================================================
+   Pointer Spinner Logic
+   ========================================================================== */
+
+.hero__chance-pointer {
+  transform-origin: 110px 110px;
+  will-change: transform;
+  transition: transform 30s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero__chance-pointer-shape {
+  fill: #b8ff2c;
+  stroke: #e1ff91;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 9px rgba(184, 255, 44, 0.72));
+}
+
+.hero__chance-pointer circle {
+  fill: #1c2817;
+  stroke: #b8ff2c;
+  stroke-width: 4;
+}
+
+.hero__chance-inner-ring {
+  fill: rgba(8, 14, 10, 0.76);
+  stroke: rgba(184, 255, 44, 0.16);
+  stroke-width: 1.5;
+}
+
+.hero__chance-ticks line {
+  stroke: rgba(184, 255, 44, 0.36);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.hero__chance-center-label {
+  fill: rgba(184, 255, 44, 0.72);
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-anchor: middle;
+}
+
+/* ==========================================================================
+   Spin Controls & Results
+   ========================================================================== */
+
+.hero__chance-random {
+  justify-self: center;
+  min-width: 190px;
+  padding: 11px 22px;
+  color: #d4f58b;
+  background: rgba(42, 58, 25, 0.82);
+  border: 1px solid rgba(184, 255, 44, 0.48);
+  border-radius: 7px;
+  box-shadow: 0 0 12px rgba(184, 255, 44, 0.14);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.hero__chance-random:hover:not(:disabled) {
+  background: rgba(74, 96, 37, 0.9);
+  box-shadow: 0 0 18px rgba(184, 255, 44, 0.28);
+  transform: translateY(-2px);
+}
+
+.hero__chance-random:disabled {
+  cursor: not-allowed;
+  color: rgba(212, 245, 139, 0.62);
+  background: rgba(42, 58, 25, 0.58);
+  box-shadow: 0 0 12px rgba(184, 255, 44, 0.2);
+}
+
+.hero__chance-random--busy:disabled {
+  cursor: wait;
+}
+
+.hero__chance-result {
+  min-height: 30px;
+  padding-top: 4px;
+  color: rgba(225, 226, 227, 0.55);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  opacity: 0;
+  text-transform: uppercase;
+  text-shadow: 0 0 16px currentColor;
+  transition: opacity 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+.hero__chance-result--visible {
+  color: #b8ff2c;
+  opacity: 1;
+  transform: scale(1.04);
+}
+
+.hero__chance-result--lose {
+  color: #ff5353;
+}
+
+/* ==========================================================================
+   Visual Win/Lose FX Marks
+   ========================================================================== */
+
+.hero__chance-effects {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1px;
+  height: 1px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.hero__chance-effect-mark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #b8ff2c;
+  font-family: "Climate Crisis", sans-serif;
+  font-size: 34px;
+  line-height: 1;
+  opacity: 0;
+  text-shadow: 0 0 12px currentColor;
+  transform: translate(-50%, -50%) scale(0.25) rotate(0deg);
+}
+
+.hero__chance-effects--win .hero__chance-effect-mark {
+  animation: chance-win-mark 1.5s cubic-bezier(0.12, 0.72, 0.2, 1) forwards;
+  animation-delay: calc(var(--m-index) * 45ms);
+}
+
+.hero__chance-effects--lose .hero__chance-effect-mark {
+  color: #ff4d4d;
+  font-size: 30px;
+  animation: chance-lose-mark 1.5s ease-in-out forwards;
+  animation-delay: calc(var(--m-index) * 45ms);
+}
+
+@keyframes chance-win-mark {
+  0% {
+    opacity: 0.2;
+    transform: translate(calc(-50% + var(--m-start-x)), calc(-50% + var(--m-start-y))) scale(0.55) rotate(-20deg);
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--m-start-x)), calc(-50% + var(--m-start-y))) scale(1) rotate(30deg);
+  }
+}
+
+@keyframes chance-lose-mark {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--m-start-x)), calc(-50% + var(--m-start-y))) scale(0.45) rotate(0deg);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--m-start-x)), calc(-50% + var(--m-start-y))) scale(0.75) rotate(-18deg);
+  }
+  75% {
+    opacity: 0.5;
+    transform: translate(calc(-50% + var(--m-start-x)), calc(-50% + var(--m-start-y))) scale(0.55) rotate(18deg);
+  }
+}
+
+/* ==========================================================================
+   Background Typography Accent
+   ========================================================================== */
+
+.akbackground {
+  position: absolute;
+  right: 50%;
+  bottom: -48px;
+  z-index: 0;
+  width: 300px;
+  color: rgba(112, 142, 38, 0.22);
+  opacity: 1;
+  font-size: 300px;
+  font-weight: 500;
+  font-family: "Climate Crisis", sans-serif;
+  line-height: 1;
+  text-align: center;
+  transform: translateX(50%) rotate(-5deg);
+  text-shadow:
+    0 0 24px rgba(190, 255, 38, 0.14),
+    1px 0 0 rgba(145, 188, 44, 0.26);
+  -webkit-text-stroke: 1px rgba(168, 198, 72, 0.16);
+  user-select: none;
+}
+
+@media (max-width: 1250px) {
+  .hero__upgrade {
+    gap: 28px;
+    padding-left: 196px;
+  }
+
+  .hero__selection-column {
+    flex-basis: 320px;
+  }
+
+  .hero__chance {
+    flex-basis: 300px;
+  }
+
+  .hero__chance-gauge,
+  .hero__chance-scale {
+    width: 290px;
+    height: 290px;
+  }
+}
+
+@media (max-width: 980px) {
+  .hero__upgrade {
+    flex-wrap: wrap;
+    padding-left: 196px;
+  }
+
+  .hero__selection-column {
+    grid-template-rows: 310px 300px;
+  }
+
+  .hero__upgrade-box {
+    height: 310px;
+    min-height: 310px;
+  }
+
+  .hero__weapon-picker {
+    height: 300px;
+  }
+
+  .hero__weapon-list {
+    height: 180px;
+  }
+
+  .hero__selected-weapon img {
+    height: 165px;
+  }
+
+  .hero__chance {
+    order: -1;
+    flex-basis: 100%;
+  }
+
+  .hero__selection-column {
+    flex-basis: min(400px, calc(50% - 14px));
+  }
 }
