@@ -23,4 +23,6 @@ code {
 
 h1,h2,h3,h4,h5,span,p{
   color: rgb(225, 226, 227);
+  padding: 0;
+  margin: 0;
 }
