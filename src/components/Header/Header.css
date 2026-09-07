@@ -20,6 +20,15 @@
   box-sizing: border-box;
 }
 
+.header__inventory {
+  margin-left: 12px;
+  color: rgba(225, 240, 193, 0.72);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 .header__balance {
   margin-left: auto;
   width: 156px;

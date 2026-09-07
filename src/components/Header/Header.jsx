@@ -7,7 +7,7 @@ import { FaSteam } from "react-icons/fa";
 
 import "./Header.css"
 
-const Header = ({ userBalance }) => {
+const Header = ({ userBalance, inventory }) => {
   return (
     <header className="header">
       <Container>
@@ -16,6 +16,7 @@ const Header = ({ userBalance }) => {
            <FaCoins /> <span className="header__balance-number">{userBalance.toLocaleString("ru-RU", { minimumFractionDigits: 2 })}</span>
            <button className="header__balance-add">+</button>
         </div>
+          <span className="header__inventory">Инвентарь: {inventory.length}</span>
         <button className="header__auth">
             Войти через Steam <FaSteam className="header__steam"></FaSteam>
         </button>

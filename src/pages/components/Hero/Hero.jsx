@@ -11,7 +11,7 @@ const weapons = [
   { id: 3, image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fgrizly.club%2Fuploads%2Fposts%2F2023-08%2Fthumbs%2F1692205504_grizly-club-p-kartinki-awp-bez-fona-14.png&f=1&nofb=1&ipt=72f09af2ea0b09d5ff43924323727be00920588a28fb99e5a3d2ef797b77ca01", name: "AWP", type: "Sniper", rarity: "Легендарный", upgrade: 35, price: 475, glow: "rgba(255, 190, 55, 0.68)" },
   { id: 4, image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fsteamcdn-a.akamaihd.net%2Fapps%2F730%2Ficons%2Fecon%2Fdefault_generated%2Fweapon_glock_cu_glock_moon_rabbit_light_large.9063b9745250446c657632eb13a6325f51d101f2.png&f=1&nofb=1&ipt=e0f60c86eec61fa11a792708cdc57f78345281dc1e69e788b7bbf02882c43394", name: "Glock-18", type: "Pistol", rarity: "Мифический", upgrade: 18, price: 180, glow: "rgba(255, 48, 48, 0.72)" },
   { id: 5, image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fsteamcommunity-a.akamaihd.net%2Feconomy%2Fimage%2F-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpoo6m1FBRp3_bGcjhQ09Siq5KOk8jxN7zUhVRd4cJ5nqfHodun3AKy-hc_a276JYfEIFM7aQzYqFS4yOm61MXpv8nKm3dl7CN0-z-DyAQKbHsO%2F512fx384f&f=1&nofb=1&ipt=79d20b2b5d47e5b9e1dcfa4f0868770ae2de90076f16c1478aabb5c9d050f71e", name: "USP-S", type: "Pistol", rarity: "Эпический", upgrade: 27, price: 310, glow: "rgba(166, 79, 255, 0.68)" },
-  { id: 6, image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fsteamcommunity-a.akamaihd.net%2Feconomy%2Fimage%2F-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf2PLacDBA5ciJl5W0nPbmMrbummRD7fp9g-7J4cKi2A3kqhY9Zm6hJ9eXI1RqaVqF-ljowb271564vMyaznA1viF2s3jegVXp1uIYPzxv&f=1&nofb=1&ipt=f8f26c4b8d3fa51016e1db3e659c3ff980e6528971dc97809ed90b2e8184a75c", name: "Karambit", type: "Knife", rarity: "Легендарный", upgrade: 42, price: 890, glow: "rgba(255, 202, 74, 0.68)" },
+  { id: 6, image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fsteamcommunity-a.akamaihd.net%2Feconomy%2Fimage%2F-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf2PLacDBA5ciJl5W0nPbmMrbummRD7fp9g-7J4cKi2A3kqhY9Zm6hJ9eXI1RqaVqF-ljowb271564vMyaznA1viF2s3jegVXp1uIYPzxv&f=1&nofb=1&ipt=f8f26c4b8d3fa51016e1db3e659c3ff980e6528971dc97809ed90b2e8184a75c", name: "Karambit", type: "Knife", rarity: "Легендарный", upgrade: 32, price: 890, glow: "rgba(255, 202, 74, 0.68)" },
   { id: 7, image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fsteamcommunity-a.akamaihd.net%2Feconomy%2Fimage%2F-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf2PLacDBA5ciJl5W0nPbmMrbummRD7fp9g-7J4cKi2A3kqhY9Zm6hJ9eXI1RqaVqF-ljowb271564vMyaznA1viF2s3jegVXp1uIYPzxv&f=1&nofb=1&ipt=f8f26c4b8d3fa51016e1db3e659c3ff980e6528971dc97809ed90b2e8184a75c", name: "M4A4", type: "Rifle", rarity: "Мифический", upgrade: 31, price: 360, glow: "rgba(255, 42, 42, 0.72)" },
 ];
 
@@ -24,9 +24,9 @@ const WeaponPicker = ({ selectedWeapon, onSelect, minimumPrice = 0, disabled = f
   const sortedWeapons = [...weapons]
     .filter((weapon) => weapon.price >= minimumFilterPrice && weapon.price <= maximumFilterPrice)
     .sort((firstWeapon, secondWeapon) => (
-    sortOrder === "asc"
-      ? firstWeapon.price - secondWeapon.price
-      : secondWeapon.price - firstWeapon.price
+      sortOrder === "asc"
+        ? firstWeapon.price - secondWeapon.price
+        : secondWeapon.price - firstWeapon.price
     ));
 
   return (
@@ -76,32 +76,32 @@ const WeaponPicker = ({ selectedWeapon, onSelect, minimumPrice = 0, disabled = f
         </label>
       </div>
       <div className="hero__weapon-list">
-      {sortedWeapons.map((weapon) => (
-        <button
-          className={`hero__weapon-card${selectedWeapon?.id === weapon.id ? " hero__weapon-card--selected" : ""}${weapon.price < minimumPrice || disabled ? " hero__weapon-card--disabled" : ""}`}
-          key={weapon.id}
-          type="button"
-          onClick={() => onSelect(weapon)}
-          disabled={disabled || weapon.price < minimumPrice}
-          style={{ "--weapon-glow": weapon.glow }}
-          aria-label={`Выбрать ${weapon.name}`}
-          aria-pressed={selectedWeapon?.id === weapon.id}
-        >
-          <img src={weapon.image} alt="" />
-          <span>
-            <strong>{weapon.name}</strong>
-            <small>{weapon.type}</small>
-            <em><FaCoins /> {weapon.price}</em>
-          </span>
-          <b>{weapon.upgrade}%</b>
-        </button>
-      ))}
+        {sortedWeapons.map((weapon) => (
+          <button
+            className={`hero__weapon-card${selectedWeapon?.id === weapon.id ? " hero__weapon-card--selected" : ""}${weapon.price < minimumPrice || disabled ? " hero__weapon-card--disabled" : ""}`}
+            key={weapon.id}
+            type="button"
+            onClick={() => onSelect(weapon)}
+            disabled={disabled || weapon.price < minimumPrice}
+            style={{ "--weapon-glow": weapon.glow }}
+            aria-label={`Выбрать ${weapon.name}`}
+            aria-pressed={selectedWeapon?.id === weapon.id}
+          >
+            <img src={weapon.image} alt="" />
+            <span>
+              <strong>{weapon.name}</strong>
+              <small>{weapon.type}</small>
+              <em><FaCoins /> {weapon.price}</em>
+            </span>
+            <b>{weapon.upgrade}%</b>
+          </button>
+        ))}
       </div>
     </div>
   );
 };
 
-const Hero = ({ userBalance, setUserBalance }) => {
+const Hero = ({ userBalance, setUserBalance, inventory, setInventory }) => {
   const [selectedSourceWeapon, setSelectedSourceWeapon] = useState(null);
   const [selectedTargetWeapon, setSelectedTargetWeapon] = useState(null);
   const upgradeChance = selectedTargetWeapon?.upgrade ?? 50;
@@ -113,10 +113,9 @@ const Hero = ({ userBalance, setUserBalance }) => {
   const spinRotationRef = useRef(0);
   const [isSpinning, setIsSpinning] = useState(false);
   const [isPointerResetting, setIsPointerResetting] = useState(false);
-  const [isPointerNormalizing, setIsPointerNormalizing] = useState(false);
+  const [isSnapNormalizing, setIsSnapNormalizing] = useState(false);
   const [spinResult, setSpinResult] = useState("");
-  const [winningWeapon, setWinningWeapon] = useState(null);
-  const [isWinOverlayClosing, setIsWinOverlayClosing] = useState(false);
+
   const handleSourceWeaponSelect = (weapon) => {
     setSelectedSourceWeapon(weapon);
     setSelectedTargetWeapon((currentWeapon) => (
@@ -151,7 +150,7 @@ const Hero = ({ userBalance, setUserBalance }) => {
   }, [upgradeChance]);
 
   const spinChance = () => {
-    if (isSpinning || !canSpin) {
+    if (isSpinning || isPointerResetting || !canSpin) {
       return;
     }
 
@@ -176,15 +175,13 @@ const Hero = ({ userBalance, setUserBalance }) => {
     }
 
     setSpinResult("");
-    setWinningWeapon(null);
-    setIsWinOverlayClosing(false);
     setIsSpinning(true);
     setIsPointerResetting(false);
-    setIsPointerNormalizing(false);
+    setIsSnapNormalizing(false);
 
     const landingRotation = (landingPercent / 100) * 360;
     const currentRot = spinRotationRef.current;
-    const baseRounds = 5 * 360; // 5 полных оборотов рулетки
+    const baseRounds = 5 * 360;
     const targetRotation = Math.ceil(currentRot / 360) * 360 + baseRounds + landingRotation;
 
     const pointerPercent = ((targetRotation % 360 + 360) % 360) / 360 * 100;
@@ -193,43 +190,44 @@ const Hero = ({ userBalance, setUserBalance }) => {
     spinRotationRef.current = targetRotation;
     setSpinRotation(targetRotation);
 
-    const SPIN_TIME = 30000;     // Время естественного вращения
-    const RESULT_PAUSE = 2800;   // Пауза демонстрации результата
-    const RESET_TIME = 800;      // Время возврата стрелки в ноль
+    const SPIN_TIME = 7500;
+    const RESULT_PAUSE = 1600;
+    const RESET_TIME = 1100;
 
     window.setTimeout(() => {
       if (isWin) {
-        setUserBalance((currentBalance) => currentBalance + targetWeapon.price);
-        setWinningWeapon(targetWeapon);
+        setInventory((currentInventory) => (
+          currentInventory.some((weapon) => weapon.id === targetWeapon.id)
+            ? currentInventory
+            : [...currentInventory, targetWeapon]
+        ));
       }
       setSpinResult(isWin ? "Победа" : "Проигрыш");
 
       window.setTimeout(() => {
-        setIsPointerResetting(true);
+        let normalized = ((targetRotation % 360) + 360) % 360;
+        if (normalized > 180) {
+          normalized -= 360;
+        }
 
-        const currentAngle = targetRotation % 360;
-        const resetDelta = (360 - currentAngle) % 360;
-        const resetRotation = targetRotation + resetDelta;
-        spinRotationRef.current = resetRotation;
-        setSpinRotation(resetRotation);
+        setIsSnapNormalizing(true);
+        spinRotationRef.current = normalized;
+        setSpinRotation(normalized);
 
-        window.setTimeout(() => {
-          setIsPointerNormalizing(true);
-          spinRotationRef.current = 0;
-          setSpinRotation(0);
-
+        requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            setSpinResult(""); // Возвращаем зеленый цвет шкале после проигрыша/победы
-            setIsWinOverlayClosing(true);
+            setIsSnapNormalizing(false);
+            setIsPointerResetting(true);
+            spinRotationRef.current = 0;
+            setSpinRotation(0);
+
             window.setTimeout(() => {
-              setWinningWeapon(null);
-              setIsWinOverlayClosing(false);
-            }, 450);
-            setIsPointerResetting(false);
-            setIsPointerNormalizing(false);
-            setIsSpinning(false);
+              setSpinResult("");
+              setIsPointerResetting(false);
+              setIsSpinning(false);
+            }, RESET_TIME);
           });
-        }, RESET_TIME);
+        });
       }, RESULT_PAUSE);
     }, SPIN_TIME);
   };
@@ -310,20 +308,25 @@ const Hero = ({ userBalance, setUserBalance }) => {
       : "hero__chance-fill--default"
   }`;
 
+  // Траектория: старт умеренный, середина плавная, конец остановки сильнее растянут и мягче
+  const pointerTransition = isSnapNormalizing
+    ? "none"
+    : isPointerResetting
+    ? "transform 1.1s cubic-bezier(0.16, 1, 0.3, 1)"
+    : isSpinning
+    ? "transform 7.5s cubic-bezier(0.35, 0.0, 0.1, 1)"
+    : "none";
+
   return (
-    <section className="hero">
-      {winningWeapon && (
-        <div className={`hero__win-overlay${isWinOverlayClosing ? " hero__win-overlay--closing" : ""}`} role="status" aria-live="polite">
-          <div className="hero__win-content" style={{ "--weapon-glow": winningWeapon.glow }}>
-            <span className="hero__win-kicker">Апгрейд завершён</span>
-            <img src={winningWeapon.image} alt={winningWeapon.name} />
-            <strong>Выигрыш</strong>
-            <span className="hero__win-name">{winningWeapon.name}</span>
-            <span className="hero__win-price"><FaCoins /> {winningWeapon.price}</span>
-          </div>
-        </div>
-      )}
-      {/* Стили для смены цветов шкалы */}
+    <section
+      className={`hero${
+        spinResult === "Победа"
+          ? " hero--win"
+          : spinResult === "Проигрыш"
+          ? " hero--lose"
+          : ""
+      }`}
+    >
       <style>{`
         .hero__chance-fill--win {
           stroke: #b8ff2c !important;
@@ -367,21 +370,20 @@ const Hero = ({ userBalance, setUserBalance }) => {
       <Container>
         <div className="hero__upgrade">
           <div className="hero__selection-column">
-            <div className="hero__upgrade-box">
+            <div className={`hero__upgrade-box${selectedSourceWeapon ? " hero__upgrade-box--selected" : ""}`}>
               <h4 className="hero__upgrade-title" id="upgrade_small">
                 Выберете по цене скин который хотите прокачать
               </h4>
+              <span className="akbackground" aria-hidden="true">M</span>
               {selectedSourceWeapon ? (
-                <div className="hero__selected-weapon" style={{ "--weapon-glow": selectedSourceWeapon.glow }}>
+                <div className="hero__selected-weapon" key={selectedSourceWeapon.id} style={{ "--weapon-glow": selectedSourceWeapon.glow }}>
                   <img src={selectedSourceWeapon.image} alt={selectedSourceWeapon.name} />
                   <strong>{selectedSourceWeapon.name}</strong>
                   <span>{selectedSourceWeapon.type} · <FaCoins /> {selectedSourceWeapon.price}</span>
                 </div>
-              ) : (
-                <span className="akbackground">M</span>
-              )}
+              ) : null}
             </div>
-            <WeaponPicker selectedWeapon={selectedSourceWeapon} onSelect={handleSourceWeaponSelect} disabled={isSpinning} />
+            <WeaponPicker selectedWeapon={selectedSourceWeapon} onSelect={handleSourceWeaponSelect} disabled={isSpinning || isPointerResetting} />
           </div>
           <div
             className="hero__chance"
@@ -428,57 +430,23 @@ const Hero = ({ userBalance, setUserBalance }) => {
                 </text>
                 <g
                   className="hero__chance-pointer"
-                  data-resetting={isPointerResetting}
-                  data-normalizing={isPointerNormalizing}
-                  data-spinning={isSpinning}
                   style={{
                     transform: `rotate(${spinRotation}deg)`,
-                    "--pointer-target-rotation": `${spinRotation}deg`,
-                    transition: isPointerNormalizing
-                      ? "none"
-                      : isPointerResetting
-                      ? "transform 0.8s cubic-bezier(0.02, 0.98, 0.72, 1)"
-                      : isSpinning
-                      ? "transform 30s cubic-bezier(0.08, 0.82, 0.17, 1)"
-                      : "none",
+                    transition: pointerTransition,
                   }}
                 >
-                  <path className="hero__chance-pointer-shape" d="M 110 198 L 104 215 L 110 209 L 116 215 Z" />
-                  <circle cx="110" cy="196" r="5" />
+                  <path className="hero__chance-pointer-shape" d="M 110 194 L 101 216 L 119 216 Z" />
                 </g>
               </svg>
               <strong className="hero__chance-value">{displayedChance}%</strong>
-              {spinResult && (
-                <div className={`hero__chance-effects hero__chance-effects--${spinResult === "Победа" ? "win" : "lose"}`} aria-hidden="true">
-                  {Array.from({ length: 18 }, (_, index) => {
-                    const effectCount = 18;
-                    const effectAngle = Math.PI / 2 + (index / effectCount) * Math.PI * 2;
-                    const effectRadius = 176;
-
-                    return (
-                      <span
-                        className="hero__chance-effect-mark"
-                        key={index}
-                        style={{
-                          "--m-index": index,
-                          "--m-start-x": `${Math.cos(effectAngle) * effectRadius}px`,
-                          "--m-start-y": `${Math.sin(effectAngle) * effectRadius}px`,
-                        }}
-                      >
-                        M
-                      </span>
-                    );
-                  })}
-                </div>
-              )}
             </div>
             <button
-              className={`hero__chance-random${isSpinning ? " hero__chance-random--busy" : ""}`}
+              className={`hero__chance-random${isSpinning || isPointerResetting ? " hero__chance-random--busy" : ""}`}
               type="button"
               onClick={spinChance}
-              disabled={isSpinning || !canSpin}
+              disabled={isSpinning || isPointerResetting || !canSpin}
             >
-              {isSpinning
+              {isSpinning || isPointerResetting
                 ? "Крутится..."
                 : !selectedSourceWeapon || !selectedTargetWeapon
                 ? "Выберите оружие"
@@ -493,23 +461,22 @@ const Hero = ({ userBalance, setUserBalance }) => {
             </span>
           </div>
           <div className="hero__selection-column">
-            <div className="hero__upgrade-box">
+            <div className={`hero__upgrade-box${selectedTargetWeapon ? " hero__upgrade-box--selected" : ""}`}>
               <h4 className="hero__upgrade-title">Выберете скин для прокачки</h4>
+              <span className="akbackground" aria-hidden="true">M</span>
               {selectedTargetWeapon ? (
-                <div className="hero__selected-weapon" style={{ "--weapon-glow": selectedTargetWeapon.glow }}>
+                <div className="hero__selected-weapon" key={selectedTargetWeapon.id} style={{ "--weapon-glow": selectedTargetWeapon.glow }}>
                   <img src={selectedTargetWeapon.image} alt={selectedTargetWeapon.name} />
                   <strong>{selectedTargetWeapon.name}</strong>
                   <span>{selectedTargetWeapon.type} · <FaCoins /> {selectedTargetWeapon.price} · {selectedTargetWeapon.upgrade}%</span>
                 </div>
-              ) : (
-                <span className="akbackground">M</span>
-              )}
+              ) : null}
             </div>
             <WeaponPicker
               selectedWeapon={selectedTargetWeapon}
               onSelect={setSelectedTargetWeapon}
               minimumPrice={selectedSourceWeapon?.price ?? 0}
-              disabled={isSpinning}
+              disabled={isSpinning || isPointerResetting}
             />
           </div>
         </div>
