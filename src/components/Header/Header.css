@@ -112,7 +112,29 @@
   font-size: 18px;
 }
 
+/* --- Кнопка с аватаркой в шапке --- */
+.header__user-profile {
+  margin-left: 12px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
 
+.header__user-profile:hover {
+  transform: scale(1.05);
+}
+
+.header__avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  border: 2px solid #9dff00;
+  object-fit: cover;
+  box-shadow: 0 0 8px rgba(157, 255, 0, 0.4);
+}
+
+/* --- Модальное окно авторизации --- */
 .header__backdrop {
   position: fixed;
   inset: 0;
@@ -142,12 +164,22 @@
   animation: modalScale 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Плавное появление фона */
 @keyframes fadeIn {
   from {
     opacity: 0;
   }
   to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalScale {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
     opacity: 1;
   }
 }
@@ -196,7 +228,6 @@
   border-color: #9dff0076;
 }
 
-/* Галочка */
 .header__modal-checkbox:checked::after {
   content: "";
   position: absolute;
@@ -227,8 +258,6 @@
   transition: all 0.2s ease;
 }
 
-
-
 .header__steam-login:active {
   transform: translateY(0);
 }
@@ -255,4 +284,3 @@
   color: #ffffff;
   background: rgba(255, 255, 255, 0.12);
 }
-

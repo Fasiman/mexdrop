@@ -1,0 +1,219 @@
+.profile__backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+    
+  animation: fadeIn 0.3s ease-out;
+}
+
+.profile__modal {
+  position: relative;
+  background-color: #121417;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 40px 62px 40px;
+  border-radius: 20px;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+
+  animation: modalScale 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+}
+
+.profile__modal__list {
+  display: flex;
+  gap: 30px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.profile__data {
+  position: relative;
+  background-color: #222529;
+  padding: 25px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: 0.25s ease;
+}
+
+.profile__data:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+.profile__avatar {
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+
+  border: 3px solid rgba(157, 255, 0, 0.8);
+  box-shadow: 0 0 20px rgba(157, 255, 0, 0.15);
+}
+
+.profile__texts {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-left: 20px;
+}
+
+.profile__nickname {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.profile__id {
+  color: #9f9f9f;
+  font-size: 14px;
+}
+
+.profile__icons {
+  display: flex;
+  gap: 10px;
+}
+
+.profile__icons-button {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: 0.2s ease;
+}
+
+.profile__icons-button:hover {
+  background: rgba(157, 255, 0, 0.12);
+  color: #9dff00;
+  border-color: rgba(157, 255, 0, 0.25);
+  transform: translateY(-2px);
+}
+
+.profile__icons-button.profile__logout-icon:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.profile__balance {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.profile__data:last-child {
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profile__history {
+  color: #9f9f9f;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.profile__history:hover {
+  color: #fff;
+}
+
+.profile__pay {
+  padding: 8px 16px;
+  background: #9dff00;
+  border: 1px solid rgba(157, 255, 0, 0.8);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+
+  color: #111;
+  box-shadow: 0 5px 15px rgba(157, 255, 0, 0.15);
+  transition: 0.2s ease;
+}
+
+.profile__pay:hover {
+  background: #b0ff33;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(157, 255, 0, 0.25);
+}
+
+.profile__pay:active {
+  transform: translateY(0);
+}
+
+.profile__close {
+  right: 16px;
+  top: 16px;
+  color: #71717a;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: absolute;
+  font-size: 20px;
+  transition: all 0.2s ease;
+}
+
+.profile__close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* --- Кнопка выхода с аккаунта --- */
+.profile__logout {
+  width: 100%;
+  margin-top: 24px;
+  padding: 12px;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.profile__logout:hover {
+  background: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+  transform: translateY(-2px);
+}
+
+.profile__logout:active {
+  transform: translateY(0);
+}
