@@ -4,71 +4,102 @@ import Home from "./pages/Home/Home";
 const INITIAL_USER_BALANCE = 0.00;
 
 function App() {
-  const [userId, setUserId] = useState(() => localStorage.getItem("userId") || null);
-
-  const [user, setUser] = useState(() => {
-    const currentUserId = localStorage.getItem("userId");
-    if (!currentUserId) return null;
-    const saved = localStorage.getItem("userData");
-    return saved ? JSON.parse(saved) : null;
+  const [userId, setUserId] = useState(() => {
+    return localStorage.getItem("userId") || null;
   });
 
-  const [userBalance, setUserBalance] = useState(() => {
-    const currentUserId = localStorage.getItem("userId");
-    if (!currentUserId) return INITIAL_USER_BALANCE;
-    const saved = localStorage.getItem("userData");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return parsed.balance !== undefined ? parsed.balance : INITIAL_USER_BALANCE;
-    }
-    return INITIAL_USER_BALANCE;
-  });
-
-  const [inventory, setInventory] = useState(() => {
-    const currentUserId = localStorage.getItem("userId");
-    if (!currentUserId) return [];
-    const saved = localStorage.getItem("userData");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return Array.isArray(parsed.inventory) ? parsed.inventory : [];
-    }
-    return [];
-  });
+  const [user, setUser] = useState(null);
+  const [userBalance, setUserBalance] = useState(INITIAL_USER_BALANCE);
+  const [inventory, setInventory] = useState([]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const steamidFromUrl = urlParams.get("steamid");
 
-    let activeId = userId;
-
+    // Если пришёл новый steamid — авторизуем именно этого пользователя
     if (steamidFromUrl) {
-      activeId = steamidFromUrl;
-      localStorage.setItem("userId", activeId);
-      setUserId(activeId);
-      window.history.replaceState({}, document.title, window.location.pathname);
+      localStorage.setItem("userId", steamidFromUrl);
+
+      // Очень важно: очищаем старые данные предыдущего пользователя
+      localStorage.removeItem("userData");
+
+      setUserId(steamidFromUrl);
+
+      window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+      );
+
+      return;
     }
 
-    if (activeId) {
-      fetch("http://localhost:5000/api/users")
-        .then((res) => res.json())
-        .then((users) => {
-          const foundUser = users.find((u) => String(u.id || u.steamid) === String(activeId));
-
-          if (foundUser) {
-            localStorage.setItem("userData", JSON.stringify(foundUser));
-            setUser(foundUser);
-            if (foundUser.balance !== undefined) setUserBalance(foundUser.balance);
-            if (Array.isArray(foundUser.inventory)) setInventory(foundUser.inventory);
-          }
-        })
-        .catch((err) => console.error("Ошибка получения данных пользователя:", err));
-    } else {
-      // Если по какой-то причине userId удалили, сбрасываем данные у клиента
+    // НЕТ авторизации
+    if (!userId) {
       localStorage.removeItem("userData");
+
       setUser(null);
       setUserBalance(INITIAL_USER_BALANCE);
       setInventory([]);
+
+      return;
     }
+
+    // Есть userId — получаем данные именно этого пользователя
+    fetch("http://localhost:5000/api/users")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Ошибка загрузки пользователей");
+        }
+
+        return res.json();
+      })
+      .then((users) => {
+        const foundUser = users.find(
+          (u) => String(u.id || u.steamid) === String(userId)
+        );
+
+        // Пользователь не найден
+        if (!foundUser) {
+          localStorage.removeItem("userData");
+
+          setUser(null);
+          setUserBalance(INITIAL_USER_BALANCE);
+          setInventory([]);
+
+          return;
+        }
+
+        // Пользователь найден
+        localStorage.setItem("userData", JSON.stringify(foundUser));
+
+        setUser(foundUser);
+
+        setUserBalance(
+          foundUser.balance !== undefined
+            ? foundUser.balance
+            : INITIAL_USER_BALANCE
+        );
+
+        setInventory(
+          Array.isArray(foundUser.inventory)
+            ? foundUser.inventory
+            : []
+        );
+      })
+      .catch((err) => {
+        console.error(
+          "Ошибка получения данных пользователя:",
+          err
+        );
+
+        // При ошибке тоже НЕ показываем старые чужие данные
+        localStorage.removeItem("userData");
+
+        setUser(null);
+        setUserBalance(INITIAL_USER_BALANCE);
+        setInventory([]);
+      });
   }, [userId]);
 
   return (

@@ -7,6 +7,7 @@ import {
   FaPlus,
   FaMinus,
   FaBasketShopping,
+  FaXmark,
 } from "react-icons/fa6";
 import Container from "../../../components/Container/Container";
 
@@ -338,7 +339,6 @@ const WeaponPicker = ({
             const totalPrice = weapon.price * qty;
             const isAffordable = totalPrice <= userBalance;
             
-            // Инвентарь не проверяет баланс пользователя для выставления скина на кон
             const isDisabled =
               disabled || !weapon.price || weapon.price < minimumPrice || (isShopMode && !isAffordable);
 
@@ -780,12 +780,13 @@ const Hero = ({
     syncUserToBackend(nextBalance, nextInventory);
   };
 
+  /* Расчёт шанса с точностью до десятых и сотых %, от 0.01% до 90% */
   const upgradeChance = useMemo(() => {
     if (!selectedSourceWeapon || !selectedTargetWeapon) return 50;
     const sPrice = selectedSourceWeapon.price;
     const tPrice = selectedTargetWeapon.price || 1;
     const rawChance = (sPrice / tPrice) * 100;
-    return Number(Math.min(90, Math.max(1, rawChance)).toFixed(2));
+    return Number(Math.min(90, Math.max(0.01, rawChance)).toFixed(2));
   }, [selectedSourceWeapon, selectedTargetWeapon]);
 
   const canSpin = Boolean(selectedSourceWeapon && selectedTargetWeapon);
@@ -839,11 +840,11 @@ const Hero = ({
 
     const chance = Math.min(
       90,
-      Math.max(1, (sourceWeapon.price / (targetWeapon.price || 1)) * 100)
+      Math.max(0.01, (sourceWeapon.price / (targetWeapon.price || 1)) * 100)
     );
 
     const halfChance = chance / 2;
-    const boundaryPadding = Math.min(2, Math.max(0.5, halfChance / 5));
+    const boundaryPadding = Math.min(2, Math.max(0.1, halfChance / 5));
     const shouldWin = Math.random() < chance / 100;
     const safeWinWidth = halfChance - boundaryPadding;
     const safeLoseStart = halfChance + boundaryPadding;
@@ -853,10 +854,10 @@ const Hero = ({
     if (shouldWin) {
       landingPercent =
         Math.random() < 0.5
-          ? boundaryPadding + Math.random() * (safeWinWidth - boundaryPadding)
-          : 100 - halfChance + boundaryPadding + Math.random() * (safeWinWidth - boundaryPadding);
+          ? boundaryPadding + Math.random() * Math.max(0.01, safeWinWidth - boundaryPadding)
+          : 100 - halfChance + boundaryPadding + Math.random() * Math.max(0.01, safeWinWidth - boundaryPadding);
     } else {
-      landingPercent = safeLoseStart + Math.random() * (safeLoseEnd - safeLoseStart);
+      landingPercent = safeLoseStart + Math.random() * Math.max(0.01, safeLoseEnd - safeLoseStart);
     }
 
     setSpinResult("");
@@ -955,7 +956,7 @@ const Hero = ({
   const tickerItems = useMemo(() => {
     const uniqueMap = new Map();
 
-    recentUpgrades.forEach((upg, index) => {
+    recentUpgrades.forEach((upg) => {
       const item = upg.outputItem || upg;
       const key = String(upg.id || `${upg.createdAt}-${item.name}-${item.wearShort}-${item.price}`);
 
@@ -1010,29 +1011,6 @@ const Hero = ({
         </div>
       )}
 
-      <style>{`
-        .hero__top {
-          overflow: hidden !important;
-        }
-        .hero__top-track {
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 10px !important;
-          overflow: hidden !important;
-          height: 100% !important;
-        }
-        .hero__top-track.hero__top-track--drop {
-          animation: heroUpgradeDrop 380ms cubic-bezier(0.18, 0.88, 0.24, 1) both;
-        }
-        @keyframes heroUpgradeDrop {
-          from { transform: translate3d(0, -78px, 0); }
-          72% { transform: translate3d(0, 5px, 0); }
-          to { transform: translate3d(0, 0, 0); }
-        }
-        .hero__lightbox {
-          flex: 0 0 auto !important;
-        }
-      `}</style>
       <div className="hero__top">
         <div className={`hero__top-track${tickerAnimation ? " hero__top-track--drop" : ""}`}>
           {tickerItems.map((lightbox, idx) => (
@@ -1078,36 +1056,37 @@ const Hero = ({
 
       <Container>
         <div className="hero__upgrade">
-          <div className="hero__selection-column">
+          {/* ЛЕВАЯ КОЛОНКА (ИСХОДНЫЙ СКИН) */}
+          <div className="hero__selection-column hero__selection-column--source">
             <div
               className={`hero__upgrade-box${
                 selectedSourceWeapon ? " hero__upgrade-box--selected" : ""
               }`}
             >
-              <h4 className="hero__upgrade-title">Скин на кону</h4>
-              <span className="akbackground" aria-hidden="true">
-                M
-              </span>
-
               {selectedSourceWeapon ? (
-                <div
-                  className="hero__selected-weapon"
-                  key={selectedSourceWeapon.instanceId}
-                  style={{ "--weapon-glow": selectedSourceWeapon.glow }}
-                >
-                  <div style={{ position: "relative", display: "inline-block" }}>
-                    {selectedSourceWeapon.wearShort && (
-                      <span
-                        className="hero__weapon-badge"
-                        style={{
-                          backgroundColor: selectedSourceWeapon.badgeBg,
-                          color: selectedSourceWeapon.badgeColor,
-                          border: `1px solid ${selectedSourceWeapon.border}`,
-                        }}
-                      >
-                        {selectedSourceWeapon.wearShort}
-                      </span>
-                    )}
+                <>
+                  <div
+                    className="hero__upgrade-box-light"
+                    style={{ "--weapon-glow": selectedSourceWeapon.glow }}
+                  />
+                  <div className="hero__box-header">
+                    <span className="hero__box-category">★ {selectedSourceWeapon.type}</span>
+                    <button
+                      type="button"
+                      className="hero__box-close"
+                      onClick={() => setSelectedSourceWeapon(null)}
+                      title="Снять выбор"
+                    >
+                      <FaXmark />
+                    </button>
+                  </div>
+
+                  <h3 className="hero__box-title">
+                    {selectedSourceWeapon.name}{" "}
+                    {selectedSourceWeapon.wearKey ? `${selectedSourceWeapon.wearKey}` : ""}
+                  </h3>
+
+                  <div className="hero__box-image-wrap">
                     <img
                       src={selectedSourceWeapon.image}
                       alt={selectedSourceWeapon.name}
@@ -1118,23 +1097,25 @@ const Hero = ({
                     />
                   </div>
 
-                  <strong>{selectedSourceWeapon.name}</strong>
-                  <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-                    <small>{selectedSourceWeapon.type}</small>
-                    {selectedSourceWeapon.wearName && (
-                      <span style={{ color: selectedSourceWeapon.badgeColor, fontSize: "0.75rem" }}>
-                        · {selectedSourceWeapon.wearName}
-                      </span>
-                    )}
+                  <div className="hero__box-footer">
+                    <span className="hero__box-price">
+                      {selectedSourceWeapon.price.toLocaleString("ru-RU", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                    <FaCoins className="hero__coin-icon" />
                   </div>
-                  <span>
-                    <FaCoins className="hero__coin-icon" /> {selectedSourceWeapon.price.toFixed(2)} ₽
-                  </span>
-                </div>
+                </>
               ) : (
-                <div className="hero__upgrade-placeholder">
-                  Выберите скин из инвентаря или купите в магазине
-                </div>
+                <>
+                  <div className="hero__box-header">
+                    <span className="hero__box-category">Скин на кону</span>
+                  </div>
+                  <div className="hero__upgrade-placeholder">
+                    Выберите скин из инвентаря или купите в магазине
+                  </div>
+                </>
               )}
             </div>
 
@@ -1154,6 +1135,7 @@ const Hero = ({
             />
           </div>
 
+          {/* ЦЕНТРАЛЬНЫЙ ШАНС / РУЛЕТКА */}
           <div className="hero__chance" aria-label={`Шанс апгрейда: ${Number(displayedChance).toFixed(2)}%`}>
             <span className="hero__chance-label">ВЕРОЯТНОСТЬ</span>
 
@@ -1161,6 +1143,7 @@ const Hero = ({
               <svg className="hero__chance-scale" viewBox="0 0 220 220" aria-hidden="true">
                 <circle className="hero__chance-outer-ring" cx="110" cy="110" r="103" />
 
+                {/* Левый сектор закраски */}
                 <path
                   className={fillClass}
                   d="M 110 196 A 86 86 0 0 1 110 24"
@@ -1168,6 +1151,7 @@ const Hero = ({
                   style={{ "--chance-offset": 50 - displayedChance / 2 }}
                 />
 
+                {/* Правый сектор закраски */}
                 <path
                   className={fillClass}
                   d="M 110 196 A 86 86 0 0 0 110 24"
@@ -1198,6 +1182,7 @@ const Hero = ({
                   ШАНС УСПЕХА
                 </text>
 
+                {/* НОВЫЙ КРАСИВЫЙ КУРСОР В БАРАБАНЕ */}
                 <g
                   className="hero__chance-pointer"
                   style={{
@@ -1205,7 +1190,34 @@ const Hero = ({
                     transition: pointerTransition,
                   }}
                 >
-                  <path className="hero__chance-pointer-shape" d="M 110 194 L 101 216 L 119 216 Z" />
+                  {/* Подсветка острия указателя */}
+                  <path
+                    d="M 110 184 L 100 216 L 110 207 L 120 216 Z"
+                    fill="rgba(184, 255, 44, 0.35)"
+                    filter="blur(3px)"
+                  />
+                  {/* Основная стрелка курсора */}
+                  <path
+                    className="hero__chance-pointer-shape"
+                    d="M 110 185 L 101 216 L 110 208 L 119 216 Z"
+                  />
+                  {/* Центральный стержень стрелки */}
+                  <line
+                    x1="110"
+                    y1="187"
+                    x2="110"
+                    y2="208"
+                    stroke="#080a09"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                  {/* Белая сердцевина */}
+                  <circle
+                    className="hero__chance-pointer-core"
+                    cx="110"
+                    cy="200"
+                    r="2.5"
+                  />
                 </g>
               </svg>
 
@@ -1238,36 +1250,37 @@ const Hero = ({
             </span>
           </div>
 
-          <div className="hero__selection-column">
+          {/* ПРАВАЯ КОЛОНКА (ЖЕЛАЕМЫЙ СКИН) */}
+          <div className="hero__selection-column hero__selection-column--target">
             <div
               className={`hero__upgrade-box${
                 selectedTargetWeapon ? " hero__upgrade-box--selected" : ""
               }`}
             >
-              <h4 className="hero__upgrade-title">Желаемый скин</h4>
-              <span className="akbackground" aria-hidden="true">
-                M
-              </span>
-
               {selectedTargetWeapon ? (
-                <div
-                  className="hero__selected-weapon"
-                  key={selectedTargetWeapon.instanceId}
-                  style={{ "--weapon-glow": selectedTargetWeapon.glow }}
-                >
-                  <div style={{ position: "relative", display: "inline-block" }}>
-                    {selectedTargetWeapon.wearShort && (
-                      <span
-                        className="hero__weapon-badge"
-                        style={{
-                          backgroundColor: selectedTargetWeapon.badgeBg,
-                          color: selectedTargetWeapon.badgeColor,
-                          border: `1px solid ${selectedTargetWeapon.border}`,
-                        }}
-                      >
-                        {selectedTargetWeapon.wearShort}
-                      </span>
-                    )}
+                <>
+                  <div
+                    className="hero__upgrade-box-light"
+                    style={{ "--weapon-glow": selectedTargetWeapon.glow }}
+                  />
+                  <div className="hero__box-header">
+                    <span className="hero__box-category">★ {selectedTargetWeapon.type}</span>
+                    <button
+                      type="button"
+                      className="hero__box-close"
+                      onClick={() => setSelectedTargetWeapon(null)}
+                      title="Снять выбор"
+                    >
+                      <FaXmark />
+                    </button>
+                  </div>
+
+                  <h3 className="hero__box-title">
+                    {selectedTargetWeapon.name}{" "}
+                    {selectedTargetWeapon.wearKey ? `${selectedTargetWeapon.wearKey}` : ""}
+                  </h3>
+
+                  <div className="hero__box-image-wrap">
                     <img
                       src={selectedTargetWeapon.image}
                       alt={selectedTargetWeapon.name}
@@ -1278,23 +1291,25 @@ const Hero = ({
                     />
                   </div>
 
-                  <strong>{selectedTargetWeapon.name}</strong>
-                  <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-                    <small>{selectedTargetWeapon.type}</small>
-                    {selectedTargetWeapon.wearName && (
-                      <span style={{ color: selectedTargetWeapon.badgeColor, fontSize: "0.75rem" }}>
-                        · {selectedTargetWeapon.wearName}
-                      </span>
-                    )}
+                  <div className="hero__box-footer">
+                    <span className="hero__box-price">
+                      {selectedTargetWeapon.price.toLocaleString("ru-RU", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                    <FaCoins className="hero__coin-icon" />
                   </div>
-                  <span>
-                    <FaCoins className="hero__coin-icon" /> {selectedTargetWeapon.price.toFixed(2)} ₽
-                  </span>
-                </div>
+                </>
               ) : (
-                <div className="hero__upgrade-placeholder">
-                  Выберите скин, который хотите получить
-                </div>
+                <>
+                  <div className="hero__box-header">
+                    <span className="hero__box-category">Желаемый скин</span>
+                  </div>
+                  <div className="hero__upgrade-placeholder">
+                    Выберите скин, который хотите получить
+                  </div>
+                </>
               )}
             </div>
 
