@@ -13,6 +13,7 @@ const Profile = ({ user, userId, userBalance, onClose, onLogout }) => {
 
   const handleLogout = () => {
     if (onLogout) onLogout();
+    localStorage.clear()
     closeModal();
   };
 

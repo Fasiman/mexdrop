@@ -4,16 +4,18 @@ import Home from "./pages/Home/Home";
 const INITIAL_USER_BALANCE = 0.00;
 
 function App() {
-  // 1. Берем ID из localStorage
   const [userId, setUserId] = useState(() => localStorage.getItem("userId") || null);
 
-  // 2. Берем полный объект пользователя из localStorage
   const [user, setUser] = useState(() => {
+    const currentUserId = localStorage.getItem("userId");
+    if (!currentUserId) return null;
     const saved = localStorage.getItem("userData");
     return saved ? JSON.parse(saved) : null;
   });
 
   const [userBalance, setUserBalance] = useState(() => {
+    const currentUserId = localStorage.getItem("userId");
+    if (!currentUserId) return INITIAL_USER_BALANCE;
     const saved = localStorage.getItem("userData");
     if (saved) {
       const parsed = JSON.parse(saved);
@@ -23,6 +25,8 @@ function App() {
   });
 
   const [inventory, setInventory] = useState(() => {
+    const currentUserId = localStorage.getItem("userId");
+    if (!currentUserId) return [];
     const saved = localStorage.getItem("userData");
     if (saved) {
       const parsed = JSON.parse(saved);
@@ -32,7 +36,6 @@ function App() {
   });
 
   useEffect(() => {
-    // Вытягиваем ID из URL, если пришли после авторизации Steam
     const urlParams = new URLSearchParams(window.location.search);
     const steamidFromUrl = urlParams.get("steamid");
 
@@ -45,7 +48,6 @@ function App() {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
 
-    // Если есть ID — делаем фетч к серверу и загружаем ВСЕ данные объекта пользователя
     if (activeId) {
       fetch("http://localhost:5000/api/users")
         .then((res) => res.json())
@@ -53,16 +55,19 @@ function App() {
           const foundUser = users.find((u) => String(u.id || u.steamid) === String(activeId));
 
           if (foundUser) {
-            // Сохраняем полный объект в localStorage
             localStorage.setItem("userData", JSON.stringify(foundUser));
-            
-            // Записываем весь объект пользователя и его свойства в стейты
             setUser(foundUser);
             if (foundUser.balance !== undefined) setUserBalance(foundUser.balance);
             if (Array.isArray(foundUser.inventory)) setInventory(foundUser.inventory);
           }
         })
         .catch((err) => console.error("Ошибка получения данных пользователя:", err));
+    } else {
+      // Если по какой-то причине userId удалили, сбрасываем данные у клиента
+      localStorage.removeItem("userData");
+      setUser(null);
+      setUserBalance(INITIAL_USER_BALANCE);
+      setInventory([]);
     }
   }, [userId]);
 
