@@ -1,25 +1,17 @@
 import "./Profile.css";
-import { useState } from "react";
 import { FaPen, FaPlus, FaSignOutAlt } from "react-icons/fa";
 import { IoSettings, IoClose } from "react-icons/io5";
 
-const Profile = ({ user, userId, userBalance, onClose, onLogout }) => {
-  const [isOpen, setIsOpen] = useState(true);
-
-  const closeModal = () => {
-    setIsOpen(false);
-    if (onClose) onClose();
-  };
-
-  const handleLogout = () => {
-    if (onLogout) onLogout();
-    localStorage.clear()
-    closeModal();
-  };
-
+const Profile = ({ user, userId, userBalance, isOpen, onClose, onLogout }) => {
   if (!isOpen) {
     return null;
   }
+
+  const handleLogout = () => {
+    if (onLogout) onLogout();
+    localStorage.clear();
+    if (onClose) onClose();
+  };
 
   const avatarUrl =
     user?.avatar ||
@@ -30,9 +22,9 @@ const Profile = ({ user, userId, userBalance, onClose, onLogout }) => {
   const currentBalance = userBalance !== undefined ? userBalance : user?.balance || 0;
 
   return (
-    <div className="profile__backdrop" onClick={closeModal}>
+    <div className="profile__backdrop" onClick={onClose}>
       <div className="profile__modal" onClick={(e) => e.stopPropagation()}>
-        <button className="profile__close" onClick={closeModal}>
+        <button className="profile__close" onClick={onClose}>
           <IoClose />
         </button>
         <ul className="profile__modal__list">
@@ -71,7 +63,6 @@ const Profile = ({ user, userId, userBalance, onClose, onLogout }) => {
           </li>
         </ul>
 
-        {/* Кнопка выхода из аккаунта во всю ширину снизу */}
         <button className="profile__logout" onClick={handleLogout}>
           <FaSignOutAlt /> Выйти из аккаунта
         </button>

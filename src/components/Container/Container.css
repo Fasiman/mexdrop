@@ -1,7 +1,44 @@
-.container{
-    /* outline: 1px solid red; */
+.container {
+    width: 100%;
     max-width: 1600px;
+
     margin-left: auto;
     margin-right: auto;
-    width: 100%;
+
+    padding-left: 40px;
+    padding-right: 40px;
+
+    box-sizing: border-box;
+}
+
+/* Большие мониторы */
+@media (max-width: 1600px) {
+    .container {
+        padding-left: 32px;
+        padding-right: 32px;
+    }
+}
+
+/* Ноутбуки */
+@media (max-width: 1200px) {
+    .container {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+}
+
+/* Планшеты */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
+
+/* Телефоны */
+@media (max-width: 480px) {
+    .container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
 }

@@ -21,10 +21,10 @@ const CACHE_TTL = REFRESH_INTERVAL_MS;
 const BYMYKEL_SKINS = "https://cdn.jsdelivr.net/gh/ByMykel/CSGO-API@main/public/api/en/skins.json";
 const BYMYKEL_CRATES = "https://cdn.jsdelivr.net/gh/ByMykel/CSGO-API@main/public/api/en/crates.json";
 
-const BACKEND_PRICES_API = "http://localhost:5000/api/prices";
-const BACKEND_USERS_API = "http://localhost:5000/api/users";
-const BACKEND_AUTH_USER_API = "http://localhost:5000/api/auth/user";
-const BACKEND_UPGRADES_API = "http://localhost:5000/api/upgrades";
+const BACKEND_PRICES_API = "https://tim-starsmerchant-along-extends.trycloudflare.com/api/prices";
+const BACKEND_USERS_API = "https://tim-starsmerchant-along-extends.trycloudflare.com/api/users";
+const BACKEND_AUTH_USER_API = "https://tim-starsmerchant-along-extends.trycloudflare.com/api/auth/user";
+const BACKEND_UPGRADES_API = "https://tim-starsmerchant-along-extends.trycloudflare.com/api/upgrades";
 
 const WEAR_CONFIG = {
   "Factory New": {
@@ -129,7 +129,7 @@ const cleanSteamImageUrl = (url) => {
 };
 
 /* ==========================================================================
-   КОМПОНЕНТ ВЫБОРА ОРУЖИЯ (С ВКЛАДКАМИ И МАГАЗИНОМ)
+   КОМПОНЕНТ ВЫБОРА ОРУЖИЯ
    ========================================================================== */
 const WeaponPicker = ({
   title,
@@ -468,6 +468,144 @@ const WeaponPicker = ({
 };
 
 /* ==========================================================================
+   НОРМАЛИЗАЦИЯ ПРЕДМЕТОВ ИНВЕНТАРЯ
+   ========================================================================== */
+const normalizeInventoryItem = (rawItem, catalog = [], fallbackInstanceId = "") => {
+  if (!rawItem || typeof rawItem !== "object") return null;
+
+  let nestedItem =
+    rawItem.item ||
+    rawItem.skin ||
+    rawItem.outputItem ||
+    rawItem.weapon ||
+    rawItem;
+
+  if (typeof nestedItem === "string") {
+    try {
+      nestedItem = JSON.parse(nestedItem);
+    } catch {
+      nestedItem = rawItem;
+    }
+  }
+
+  if (!nestedItem || typeof nestedItem !== "object") return null;
+
+  const rawName = nestedItem.name || rawItem.name || "";
+  const rawWearShort = nestedItem.wearShort || rawItem.wearShort || "";
+  const rawWearKey = nestedItem.wearKey || rawItem.wearKey || "";
+  const cleanName = rawName.replace(/\s*\([^)]+\)$/, "").trim();
+
+  const catalogMatch =
+    catalog.find((item) => {
+      if (!item) return false;
+
+      if (nestedItem.id && item.id === nestedItem.id) {
+        if (!rawWearShort || !item.wearShort) return true;
+        return item.wearShort === rawWearShort;
+      }
+
+      if (rawName && item.name === rawName) {
+        if (rawWearShort) return item.wearShort === rawWearShort;
+        if (rawWearKey) return item.wearKey === rawWearKey;
+        return true;
+      }
+
+      if (cleanName && item.name === cleanName) {
+        if (rawWearShort) return item.wearShort === rawWearShort;
+        if (rawWearKey) return item.wearKey === rawWearKey;
+        return true;
+      }
+
+      return false;
+    }) || null;
+
+  const merged = {
+    ...(catalogMatch || {}),
+    ...(nestedItem || {}),
+    ...rawItem,
+  };
+
+  const priceCandidate =
+    rawItem.price ??
+    nestedItem.price ??
+    catalogMatch?.price ??
+    0;
+
+  const price = Number(priceCandidate);
+  const wearShort = merged.wearShort || catalogMatch?.wearShort || rawWearShort || "";
+  const wearKey = merged.wearKey || catalogMatch?.wearKey || rawWearKey || "";
+  const wearData = WEAR_CONFIG[wearKey] || WEAR_CONFIG[wearShort] || {};
+
+  return {
+    ...merged,
+    id: String(merged.id ?? catalogMatch?.id ?? `${cleanName || rawName}-${wearShort || wearKey}`),
+    instanceId: String(
+      rawItem.instanceId ??
+      rawItem.inventoryId ??
+      rawItem.uid ??
+      rawItem._id ??
+      nestedItem.instanceId ??
+      merged.instanceId ??
+      (fallbackInstanceId || `${merged.id || "item"}-${Math.random().toString(36).substring(2, 7)}`)
+    ),
+    name: cleanName || merged.name || catalogMatch?.name || "Скин",
+    type: merged.type || catalogMatch?.type || "Оружие",
+    image: cleanSteamImageUrl(merged.image || catalogMatch?.image || nestedItem.image),
+    glow: merged.glow || catalogMatch?.glow || getRarityColor(merged) || FALLBACK_COLORS.default,
+    price: Number.isFinite(price) ? price : 0,
+    wearKey: wearKey,
+    wearName: merged.wearName || catalogMatch?.wearName || wearData.ru || "",
+    wearShort: wearShort || wearData.short || "",
+    badgeBg: merged.badgeBg || catalogMatch?.badgeBg || wearData.badgeBg || undefined,
+    badgeColor: merged.badgeColor || catalogMatch?.badgeColor || wearData.badgeColor || undefined,
+    border: merged.border || catalogMatch?.border || wearData.border || undefined,
+  };
+};
+
+/* ==========================================================================
+   ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ЛЕНТЫ АПГРЕЙДОВ
+   ========================================================================== */
+const getUpgradeTimestamp = (item) => {
+  if (!item) return 0;
+  const raw =
+    item.createdAt ||
+    item.created_at ||
+    item.date ||
+    item.timestamp ||
+    item.time;
+  if (raw) {
+    const num = Number(raw);
+    if (!isNaN(num) && num > 0) return num > 1e11 ? num : num * 1000;
+    const parsed = Date.parse(raw);
+    if (!isNaN(parsed)) return parsed;
+  }
+  const idStr = String(item._id || item.id || "");
+  if (/^[0-9a-fA-F]{24}$/.test(idStr)) {
+    const sec = parseInt(idStr.substring(0, 8), 16);
+    if (!isNaN(sec) && sec > 0) return sec * 1000;
+  }
+  return 0;
+};
+
+const isUpgradeWin = (upg) => {
+  if (!upg) return false;
+  const wonVal = upg.won ?? upg.isWin ?? upg.win ?? upg.is_win ?? upg.status ?? upg.result;
+  if (wonVal === undefined || wonVal === null) {
+    if (typeof upg.profit === "number") return upg.profit > 0;
+    return true;
+  }
+  return (
+    wonVal === true ||
+    wonVal === "true" ||
+    wonVal === 1 ||
+    wonVal === "1" ||
+    String(wonVal).toLowerCase() === "won" ||
+    String(wonVal).toLowerCase() === "success" ||
+    String(wonVal).toLowerCase() === "win"
+  );
+};
+
+/* ==========================================================================
    ОСНОВНОЙ КОМПОНЕНТ HERO
    ========================================================================== */
 const Hero = ({
@@ -494,8 +632,18 @@ const Hero = ({
   const userBalance = externalUserBalance !== undefined ? externalUserBalance : internalBalance;
   const setUserBalance = setExternalUserBalance || setInternalBalance;
 
-  const inventory = externalInventory || internalInventory;
+  const inventory = externalInventory ?? internalInventory;
   const setInventory = setExternalInventory || setInternalInventory;
+
+  const displayInventory = useMemo(
+    () =>
+      Array.isArray(inventory)
+        ? inventory
+            .map((item, index) => normalizeInventoryItem(item, skins, `db-inventory-${index}-${item?.id ?? item?.name ?? "item"}`))
+            .filter(Boolean)
+        : [],
+    [inventory, skins]
+  );
 
   useEffect(() => {
     steamIdRef.current = steamId;
@@ -503,29 +651,80 @@ const Hero = ({
 
   const fetchUpgrades = useCallback(async () => {
     try {
-      const res = await fetch(`${BACKEND_UPGRADES_API}?limit=30`, { credentials: "include" });
+      const res = await fetch(`${BACKEND_UPGRADES_API}?limit=50&_t=${Date.now()}`, {
+        cache: "no-store",
+        credentials: "include",
+      });
       if (!res.ok) return;
 
       const data = await res.json();
-      if (!Array.isArray(data)) return;
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.upgrades)
+        ? data.upgrades
+        : Array.isArray(data?.data)
+        ? data.data
+        : [];
 
-      const winsOnly = data.filter((upg) =>
-        upg?.won === true || upg?.won === "true" || upg?.won === 1
-      );
+      if (!Array.isArray(list)) return;
 
-      const ids = winsOnly.map((upg) => String(upg.id || `${upg.createdAt}-${upg.outputItem?.name || upg.name}`));
-      const previousIds = previousTickerIdsRef.current;
+      const winsOnly = list.filter(isUpgradeWin);
 
-      if (previousIds.length > 0 && ids.length > 0 && ids[0] !== previousIds[0]) {
-        setTickerAnimation(false);
-        requestAnimationFrame(() => {
-          setTickerAnimation(true);
-          window.setTimeout(() => setTickerAnimation(false), 380);
+      // Гарантируем сортировку: сначала свежие (по времени или порядку добавления в базу)
+      const sortedWins = [...winsOnly].reverse().sort((a, b) => {
+        const tA = getUpgradeTimestamp(a);
+        const tB = getUpgradeTimestamp(b);
+        if (tA && tB && tA !== tB) {
+          return tB - tA;
+        }
+        if (tB && !tA) return 1;
+        if (tA && !tB) return -1;
+        return 0;
+      });
+
+      setRecentUpgrades((prevRecent) => {
+        // Удерживаем мгновенно созданный выигрыш до тех пор, пока бэкенд не отдаст его в общем списке
+        const instantItems = prevRecent.filter((p) =>
+          String(p?._id || p?.id || "").startsWith("instant-")
+        );
+
+        const pendingInstant = instantItems.filter((inst) => {
+          const instItem = inst.outputItem || inst;
+          const instName = instItem?.name || inst?.name;
+          const instTime = getUpgradeTimestamp(inst) || Date.now();
+
+          return !sortedWins.some((w) => {
+            const wItem = w.outputItem || w;
+            const wName = wItem?.name || w?.name;
+            const wTime = getUpgradeTimestamp(w);
+            const isSameName = wName && instName && wName === instName;
+            const isCloseInTime = wTime ? Math.abs(wTime - instTime) < 25000 : true;
+            return isSameName && isCloseInTime;
+          });
         });
-      }
 
-      previousTickerIdsRef.current = ids;
-      setRecentUpgrades(winsOnly);
+        const combined = [...pendingInstant, ...sortedWins];
+
+        const ids = combined.map((upg) => {
+          let itm = upg.outputItem || upg;
+          if (typeof itm === "string") {
+            try { itm = JSON.parse(itm); } catch {}
+          }
+          return String(upg._id || upg.id || `${upg.createdAt || ""}-${itm?.name || upg?.name || ""}`);
+        });
+
+        const previousIds = previousTickerIdsRef.current;
+        if (previousIds.length > 0 && ids.length > 0 && ids[0] !== previousIds[0]) {
+          setTickerAnimation(false);
+          requestAnimationFrame(() => {
+            setTickerAnimation(true);
+            window.setTimeout(() => setTickerAnimation(false), 380);
+          });
+        }
+        previousTickerIdsRef.current = ids;
+
+        return combined;
+      });
     } catch (e) {
       console.error("Ошибка загрузки апгрейдов с бэкенда:", e);
     }
@@ -780,7 +979,6 @@ const Hero = ({
     syncUserToBackend(nextBalance, nextInventory);
   };
 
-  /* Расчёт шанса с точностью до десятых и сотых %, от 0.01% до 90% */
   const upgradeChance = useMemo(() => {
     if (!selectedSourceWeapon || !selectedTargetWeapon) return 50;
     const sPrice = selectedSourceWeapon.price;
@@ -881,11 +1079,29 @@ const Hero = ({
 
     window.setTimeout(async () => {
       let finalInventory = updatedInventory;
+      let wonItem = null;
+
       if (isWin) {
-        const wonItem = { ...targetWeapon, instanceId: `won-${Date.now()}` };
+        wonItem = { ...targetWeapon, instanceId: `won-${Date.now()}` };
         finalInventory = [...updatedInventory, wonItem];
         setInventory(finalInventory);
         setSpinResult("УСПЕШНЫЙ АПГРЕЙД!");
+
+        // Мгновенное добавление в ленту на первое место с плавной анимацией
+        const instantItem = {
+          _id: `instant-${Date.now()}`,
+          id: `instant-${Date.now()}`,
+          won: true,
+          outputItem: { ...targetWeapon },
+          createdAt: new Date().toISOString(),
+        };
+
+        setRecentUpgrades((prev) => [instantItem, ...prev]);
+        setTickerAnimation(false);
+        requestAnimationFrame(() => {
+          setTickerAnimation(true);
+          window.setTimeout(() => setTickerAnimation(false), 380);
+        });
       } else {
         setSpinResult("АПГРЕЙД СГОРЕЛ");
       }
@@ -893,38 +1109,61 @@ const Hero = ({
       syncUserToBackend(userBalance, finalInventory);
       setSelectedSourceWeapon(null);
 
-      if (isWin) {
-        try {
-          const safeSourcePrice = Number(sourceWeapon.price) || 0;
-          const safeTargetPrice = Number(targetWeapon.price) || 0;
-          const safeChance = Number(chance.toFixed(2));
-          const safeMultiplier = safeSourcePrice > 0
-            ? Number((safeTargetPrice / safeSourcePrice).toFixed(4))
-            : 0;
+      try {
+        const safeSourcePrice = Number(sourceWeapon.price) || 0;
+        const safeTargetPrice = Number(targetWeapon.price) || 0;
+        const safeChance = Number(chance.toFixed(2));
+        const safeMultiplier = safeSourcePrice > 0
+          ? Number((safeTargetPrice / safeSourcePrice).toFixed(4))
+          : 0;
+        const currentSteamId = steamIdRef.current || "76561198000000000";
 
-          const upgradeRes = await fetch(BACKEND_UPGRADES_API, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({
-              steamid: steamIdRef.current || "76561198000000000",
-              inputItem: { ...sourceWeapon, price: safeSourcePrice },
-              outputItem: { ...targetWeapon, price: safeTargetPrice },
-              chance: safeChance,
-              multiplier: safeMultiplier,
-              won: true,
-              profit: Number((safeTargetPrice - safeSourcePrice).toFixed(2)),
-            }),
-          });
+        const payload = {
+          steamid: currentSteamId,
+          steamId: currentSteamId,
+          inputItem: {
+            id: sourceWeapon.id,
+            name: sourceWeapon.name,
+            type: sourceWeapon.type,
+            image: sourceWeapon.image,
+            glow: sourceWeapon.glow,
+            price: safeSourcePrice,
+            wearShort: sourceWeapon.wearShort || "",
+            badgeBg: sourceWeapon.badgeBg,
+            badgeColor: sourceWeapon.badgeColor,
+          },
+          outputItem: {
+            id: targetWeapon.id,
+            name: targetWeapon.name,
+            type: targetWeapon.type,
+            image: targetWeapon.image,
+            glow: targetWeapon.glow,
+            price: safeTargetPrice,
+            wearShort: targetWeapon.wearShort || "",
+            badgeBg: targetWeapon.badgeBg,
+            badgeColor: targetWeapon.badgeColor,
+          },
+          chance: safeChance,
+          multiplier: safeMultiplier,
+          won: isWin,
+          profit: isWin ? Number((safeTargetPrice - safeSourcePrice).toFixed(2)) : -safeSourcePrice,
+          createdAt: new Date().toISOString(),
+        };
 
-          if (!upgradeRes.ok) {
-            console.error("Сервер не сохранил апгрейд:", upgradeRes.status);
-          } else {
-            await fetchUpgrades();
-          }
-        } catch (err) {
-          console.error("Не удалось отправить апгрейд на сервер:", err);
+        const upgradeRes = await fetch(BACKEND_UPGRADES_API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        });
+
+        if (!upgradeRes.ok) {
+          console.error("Сервер не сохранил апгрейд:", upgradeRes.status);
+        } else {
+          await fetchUpgrades();
         }
+      } catch (err) {
+        console.error("Не удалось отправить апгрейд на сервер:", err);
       }
 
       window.setTimeout(() => {
@@ -953,28 +1192,52 @@ const Hero = ({
     }, SPIN_TIME);
   };
 
+  /* Формирование списка предметов для левой рамки */
   const tickerItems = useMemo(() => {
-    const uniqueMap = new Map();
+    return recentUpgrades
+      .map((upg, idx) => {
+        if (!upg) return null;
 
-    recentUpgrades.forEach((upg) => {
-      const item = upg.outputItem || upg;
-      const key = String(upg.id || `${upg.createdAt}-${item.name}-${item.wearShort}-${item.price}`);
+        let item = upg.outputItem || upg.targetItem || upg.skin || upg.item || upg;
+        if (typeof item === "string") {
+          try {
+            item = JSON.parse(item);
+          } catch {
+            item = {};
+          }
+        }
 
-      if (!uniqueMap.has(key)) {
-        uniqueMap.set(key, {
-          id: key,
-          name: item.name || "Скин",
-          image: item.image || FALLBACK_IMAGE,
-          price: Number(item.price) || 0,
-          wearShort: item.wearShort || "",
-          badgeBg: item.badgeBg || "rgba(59, 130, 246, 0.25)",
-          badgeColor: item.badgeColor || "#60a5fa",
-          glow: item.glow || "#4ade80",
-        });
-      }
-    });
+        const uniqueKey = String(
+          upg._id ||
+          upg.id ||
+          item?.instanceId ||
+          item?.id ||
+          `upg-${upg.createdAt || Date.now()}-${idx}`
+        );
 
-    return Array.from(uniqueMap.values()).slice(0, 7);
+        const rawName = item?.name || upg?.name || "Скин";
+        const cleanName = rawName.replace(/\s*\([^)]+\)$/, "").trim();
+
+        const wearKey = item?.wearKey || upg?.wearKey || "";
+        const wearShort = item?.wearShort || upg?.wearShort || (wearKey && WEAR_CONFIG[wearKey]?.short) || "";
+        const wearData = WEAR_CONFIG[wearKey] || WEAR_CONFIG[wearShort] || {};
+
+        const rawPrice = item?.price ?? upg?.price ?? 0;
+        const price = Number(rawPrice);
+
+        return {
+          id: uniqueKey,
+          name: cleanName || rawName,
+          image: cleanSteamImageUrl(item?.image || upg?.image),
+          price: Number.isFinite(price) ? price : 0,
+          wearShort,
+          badgeBg: item?.badgeBg || upg?.badgeBg || wearData.badgeBg || "rgba(59, 130, 246, 0.25)",
+          badgeColor: item?.badgeColor || upg?.badgeColor || wearData.badgeColor || "#60a5fa",
+          glow: item?.glow || upg?.glow || getRarityColor(item) || "#4ade80",
+        };
+      })
+      .filter(Boolean)
+      .slice(0, 20);
   }, [recentUpgrades]);
 
   const fillClass = `hero__chance-fill ${
@@ -1122,7 +1385,7 @@ const Hero = ({
             <WeaponPicker
               title="Выбор оружия"
               items={skins}
-              inventoryItems={inventory}
+              inventoryItems={displayInventory}
               selectedWeapon={selectedSourceWeapon}
               onSelect={handleSelectSourceFromInventory}
               onBuyAndStake={handleBuyAndStakeFromShop}
@@ -1182,7 +1445,7 @@ const Hero = ({
                   ШАНС УСПЕХА
                 </text>
 
-                {/* НОВЫЙ КРАСИВЫЙ КУРСОР В БАРАБАНЕ */}
+                {/* СТРЕЛКА УКАЗАТЕЛЯ */}
                 <g
                   className="hero__chance-pointer"
                   style={{
@@ -1190,18 +1453,15 @@ const Hero = ({
                     transition: pointerTransition,
                   }}
                 >
-                  {/* Подсветка острия указателя */}
                   <path
                     d="M 110 184 L 100 216 L 110 207 L 120 216 Z"
                     fill="rgba(184, 255, 44, 0.35)"
                     filter="blur(3px)"
                   />
-                  {/* Основная стрелка курсора */}
                   <path
                     className="hero__chance-pointer-shape"
                     d="M 110 185 L 101 216 L 110 208 L 119 216 Z"
                   />
-                  {/* Центральный стержень стрелки */}
                   <line
                     x1="110"
                     y1="187"
@@ -1211,7 +1471,6 @@ const Hero = ({
                     strokeWidth="1.5"
                     strokeLinecap="round"
                   />
-                  {/* Белая сердцевина */}
                   <circle
                     className="hero__chance-pointer-core"
                     cx="110"

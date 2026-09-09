@@ -8,7 +8,7 @@ import { IoClose } from "react-icons/io5";
 
 import "./Header.css";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const API_URL = process.env.REACT_APP_API_URL || "https://tim-starsmerchant-along-extends.trycloudflare.com";
 
 const Header = ({ userBalance, inventory, user }) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -155,15 +155,14 @@ const Header = ({ userBalance, inventory, user }) => {
       )}
 
       {/* Модалка профиля */}
-      {isProfileModalOpen && (
-        <Profile
-          user={userData}
-          userId={userData?.steamid || userData?.id || localStorage.getItem("userId")}
-          userBalance={userBalance}
-          onClose={closeProfileModal}
-          onLogout={handleLogout}
-        />
-      )}
+      <Profile
+        isOpen={isProfileModalOpen}
+        user={userData}
+        userId={userData?.steamid || userData?.id || localStorage.getItem("userId")}
+        userBalance={userBalance}
+        onClose={closeProfileModal}
+        onLogout={handleLogout}
+      />
     </header>
   );
 };
